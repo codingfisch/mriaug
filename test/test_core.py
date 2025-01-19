@@ -2,7 +2,6 @@ import unittest
 from torch import ones, rand, equal, randn, zeros, tensor, allclose, linspace
 
 from mriaug import core
-
 SHAPES = ((1, 1, 7, 8, 6), (1, 3, 7, 8, 6), (3, 1, 7, 8, 6), (3, 2, 7, 8, 6))
 
 
