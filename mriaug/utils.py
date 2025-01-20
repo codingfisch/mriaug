@@ -88,7 +88,6 @@ def get_warp_grid(magnitude: (float, Tensor) = .01, steps: (int, Tensor) = 2, no
                   x_randn: Tensor = None, x: Tensor = None, size: tuple = None, device=None) -> Tensor:
     if x is not None:
         assert x.ndim == 5, f'Tensor "x" must be 5D, but got: {x.ndim}D'
-    #v = fourier_displacement3d(x=x, magnitude=magnitude, nodes=nodes)
     v = small_displacement3d(magnitude=magnitude, nodes=nodes, x_randn=x_randn, x=x, size=size, device=device)
     grid = get_identity_grid(x, size, device)
     disp = shoot_displacement3d(v, steps=steps, grid=grid[:1])
@@ -128,29 +127,6 @@ def small_displacement3d(magnitude: (float, Tensor) = .01, nodes: (int, Tensor) 
     return stack(displacements).permute(0, 2, 3, 4, 1)
 
 
-# def fourier_displacement3d(size, freq_limit=.1, magnitude=1):  # somehow produces ellipsoids
-#     freq_limits = freq_limit if isinstance(freq_limit, Iterable) else size[0] * [freq_limit]
-#     magnitudes = magnitude if isinstance(magnitude, Iterable) else size[0] * [magnitude]
-#     displacements = []
-#     for freq_lim, mag in zip(freq_limits, magnitudes):
-#         freq_size = [int(freq_lim * s) for s in size[1:]]
-#         # freq_space = torch.zeros(3, *freq_size, dtype=torch.float32)
-#         # coeff = mag * torch.randn(3, sum(freq_size), dtype=torch.float32)
-#         # freq_space[:, :, 0, 0] = mag * coeff[:, :freq_size[1]]
-#         # freq_space[:, 0, :, 0] = mag * coeff[:, freq_size[1]:-freq_size[2]]
-#         # freq_space[:, 0, 0, :] = mag * coeff[:, -freq_size[2]:]
-#         freq_space = mag * torch.randn(3, *freq_size, dtype=torch.float32)
-#         # freq_space = torch.randn(*freq_size, 3, dtype=torch.float32)
-#         # freq = F.affine_grid(torch.eye(4)[None, :3], size=[1, 3, *freq_size], align_corners=True)[0]
-#         # freq = (freq + 1) / 2
-#         # freq = (freq[..., 0]**5 + freq[..., 1]**5 + freq[..., 2]**5)**.2
-#         # freq_space[freq > 1] = 0
-#         # freq_space = freq_space.permute(3, 0, 1, 2)
-#         disp = torch.fft.irfftn(freq_space, s=size[1:], dim=(1, 2, 3))
-#         displacements.append(disp)
-#     return torch.stack(displacements).permute(0, 2, 3, 4, 1)
-
-
 def shoot(v: Tensor, steps: int = 2, grid: Tensor = None):
     v = v.permute(0, 4, 1, 2, 3)
     grid = get_identity_grid(v) if grid is None else grid
@@ -165,18 +141,6 @@ def downsample(x: Tensor, scale: (float, list) = .5, dim: int = None, mode: str 
         scale = [(scale if isinstance(scale, float) else scale[0]) if i == dim else 1 for i in range(3)]
     return interpolate(interpolate(x, scale_factor=scale, mode='nearest'), x.shape[-3:], mode=mode)
 
-import torch
-# def get_bias_field(intensity: (float, Tensor) = 1., exponent: float = 1, order: int = 4, mode_grid=None,
-#                    x_randn: Tensor = None, x: Tensor = None, size: (list, tuple) = None, device=None) -> Tensor:
-#     size, device = get_size_and_device(x, size, device)
-#     grid = get_mode_grid(order=order, x=x, size=size, device=device) if mode_grid is None else mode_grid
-#     if x_randn is None:
-#         x_randn = randn(grid.shape[:2], device=device)  # 2 * torch.rand(grid.shape[:2], device=device) - 1
-#     weights = (intensity[:, None] if isinstance(intensity, Tensor) else intensity) * x_randn[:, :grid.shape[1]].clip(min=-1, max=1)
-#     bias = grid * weights[:, :, None, None, None]
-#     bias = bias.mean(dim=1, keepdim=True)
-#     bias = bias - bias.mean(dim=(2, 3, 4), keepdim=True)
-#     return (1 + bias) ** exponent
 
 def get_bias_field(intensity: (float, Tensor) = 1., order: int = 4, mode_grid=None, x_randn: Tensor = None,
                    x: Tensor = None, size: (list, tuple) = None, device=None) -> Tensor:
@@ -217,7 +181,6 @@ def modify_k_space(x: Tensor, gain: (float, Tensor) = 1., offset: (float, Tensor
         assert len(x) == len(offset), f'Tensor "x" and "offset" must have same length, but got: {len(x)}!={len(offset)}'
     k = fft.fftn(x, s=x.shape[2:])
     k = k * (gain if isinstance(gain, float) else ndim_conform(gain, k.ndim)) + (offset if isinstance(offset, float) else ndim_conform(offset, k.ndim))
-    #k = k * gain + offset
     return fft.irfftn(k, s=k.shape[2:]).to(x.dtype)
 
 
