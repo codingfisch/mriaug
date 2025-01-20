@@ -43,3 +43,8 @@ if __name__ == '__main__':
     save_image(mriaug.spike3d(x, intensity=.2), 'data/spike.png')
     save_image(mriaug.ringing3d(x, intensity=.5), 'data/ringing.png')
     save_image(mriaug.motion3d(x, intensity=.5), 'data/motion.png')
+
+    # save_image(mriaug.ghosting3d(x, intensity=.5), 'data/junk/ghosting.png')
+    # save_image(mriaug.spike3d(x, intensity=.2), 'data/junk/spike.png')
+    # save_image(mriaug.ringing3d(x, intensity=.5), 'data/junk/ringing.png')
+    # save_image(mriaug.motion3d(x, intensity=.5), 'data/junk/motion.png')

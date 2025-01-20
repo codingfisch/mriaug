@@ -210,26 +210,15 @@ def get_order(num_modes: int) -> int:
     return int(num_modes ** .45)
 
 
-def modify_k_space(x: Tensor, gain: (float, Tensor) = 1., offset: (float, Tensor) = 0., renorm: bool = True) -> Tensor:
+def modify_k_space(x: Tensor, gain: (float, Tensor) = 1., offset: (float, Tensor) = 0.) -> Tensor:
     if isinstance(gain, Tensor):
         assert len(x) == len(gain), f'Tensor "x" and "gain" must have same length, but got: {len(x)}!={len(gain)}'
     if isinstance(offset, Tensor):
         assert len(x) == len(offset), f'Tensor "x" and "offset" must have same length, but got: {len(x)}!={len(offset)}'
-    if renorm:
-        org_min, org_max, org_q99 = prepare_renorm(x)
     k = fft.fftn(x, s=x.shape[2:])
     k = k * (gain if isinstance(gain, float) else ndim_conform(gain, k.ndim)) + (offset if isinstance(offset, float) else ndim_conform(offset, k.ndim))
     #k = k * gain + offset
-    return (apply_renorm(fft.irfftn(k, s=k.shape[2:]), org_min, org_max, org_q99) if renorm else fft.irfftn(k, s=k.shape[2:])).to(x.dtype)
-
-
-def prepare_renorm(x):
-    return batch_min(x), batch_max(x), batch_quantile(x, .99)
-
-
-def apply_renorm(x, org_min, org_max, org_q99):
-    x_min = batch_min(x)
-    return ((x - x_min) / (batch_quantile(x, .99) - x_min) * (org_q99 - org_min) + org_min).clip(max=org_max)
+    return fft.irfftn(k, s=k.shape[2:]).to(x.dtype)
 
 
 def ndim_conform(param: (int, float, Tensor), ndim: int) -> Tensor:
@@ -266,15 +255,3 @@ def get_size_and_device(x: Tensor = None, size: (list, tuple) = None, device=Non
         if x.ndim > len(size):
             size = tuple(list(x.shape[:(x.ndim - len(size))]) + list(size))
     return size, x.device if x is not None else device
-
-
-def batch_min(x: Tensor, keepdims: bool = True) -> Tensor:
-    return tensor(x.detach().cpu().numpy().min(axis=tuple(range(1, x.ndim)), keepdims=keepdims), device=x.device)
-
-
-def batch_max(x: Tensor, keepdims: bool = True) -> Tensor:
-    return tensor(x.detach().cpu().numpy().max(axis=tuple(range(1, x.ndim)), keepdims=keepdims), device=x.device)
-
-
-def batch_quantile(x: Tensor, q: float, keepdims: bool = True) -> Tensor:
-    return tensor(quantile(x.detach().cpu().numpy(), q=q, axis=tuple(range(1, x.ndim)), keepdims=keepdims), device=x.device)
