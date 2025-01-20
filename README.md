@@ -1,14 +1,16 @@
 # mriaug
-`pip install mriaug` to use a **3D image library** that **outperform alternatives** like [`torchio`](https://github.com/fepegar/torchio) and [`MONAI`](https://github.com/Project-MONAI/MONAI) by
+`pip install mriaug` to use a **3D image library** that is [**faster**]() than [`torchio`](https://github.com/fepegar/torchio) and [`MONAI`](https://github.com/Project-MONAI/MONAI) by
 
-- **only** using **PyTorch** → full autograd and GPU support 🔥
-- consisting of only **~300 lines of code** → no room for bugs 🐛
+- **only** using **PyTorch** → full GPU(+autograd) support 🔥
+- being tiny: **<300 lines of code** → no room for bugs 🐛
     
 while offering **~20 different augmentations** (incl. MRI-specific operations) 🩻
 
-⚠️ For random augmentations (e.g. `random_flip3d` instead of `flip3d`) use `mriaug` either
-- via [`niftiai`](https://github.com/codingfisch/niftiai), a deep learning framework for 3D images that contains random `mriaug` augmentations 🧠
-- or as a backend to build your own random augmentations (use [`niftiai/augment.py`](https://github.com/codingfisch/niftiai/blob/main/niftiai/augment.py) as a cheat sheet) 💪
+⚠️ Normal users 👶 should use `mriaug` via [`niftiai`](https://github.com/codingfisch/niftiai), a deep learning framework, since it
+- provides the function `aug_transforms3d`: A convenient way to compile all `mriaug`mentations!
+- simplifies all the code needed for data loading, training, visualization...check it out [here](https://github.com/codingfisch/niftiai)!
+
+⚠️ Experienced users 👴 that only want to use `mriaug` can read [`niftiai/augment.py`](https://github.com/codingfisch/niftiai/blob/main/niftiai/augment.py) as a cheat sheet
 
 ## Usage 💡
 Let's create a 3D image tensor (with additional batch and channel dimension) and apply `flip3d`
@@ -98,3 +100,17 @@ and **run all augmentations** (see [`runall.py`](https://github.com/codingfisch/
 
 ### [`motion3d(x, intensity=.5)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L149)
 ![](data/motion.png)
+
+## Speed
+
+| Transformation | Image size | torchio | mriaug (CPU) | mriaug (GPU) |
+|----------------|------------|---------|--------------|--------------|
+| Flip           | 256³       | 0.020   | 0.011        | 0.007        |
+| Affine         | 256³       | 0.291   | 0.604        | 0.030        |
+| Warp           | 256³       | 0.895   | 3.992        | 0.129        |
+| Noise          | 256³       | 0.112   | 0.103        | 0.001        |
+| Motion         | 256³       | 0.657   | 0.520        | 0.045        |
+| Bias Field     | 256³       | 3.145   | 4.175        | 0.156        |
+| Ghosting       | 256³       | 0.228   | 0.162        | 0.003        |
+| Spike          | 256³       | 0.261   | 0.161        | 0.003        |
+| Downsample     | 256³       | 0.277   | 0.012        | 0.001        |
