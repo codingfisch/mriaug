@@ -6,7 +6,7 @@
     
 while offering **~20 different augmentations** (incl. MRI-specific operations) 🩻
 
-⚠️ Normal users 👶 should use `mriaug` via [`niftiai`](https://github.com/codingfisch/niftiai), a deep learning framework, since it
+⚠️ Normal users 👶 should use `mriaug` via [`niftiai`](https://github.com/codingfisch/niftiai), a deep learning framework for 3d images, since it
 - provides the function `aug_transforms3d`: A convenient way to compile all `mriaug`mentations!
 - simplifies all the code needed for data loading, training, visualization...check it out [here](https://github.com/codingfisch/niftiai)!
 
