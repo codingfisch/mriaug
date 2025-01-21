@@ -1,5 +1,5 @@
 # mriaug
-`pip install mriaug` to use a **3D image library** that is **[~50x faster]() and simpler than [`torchio`](https://github.com/fepegar/torchio)** by
+`pip install mriaug` to use a **3D image library** that is **[~50x faster and simpler](https://github.com/codingfisch/mriaug?tab=readme-ov-file#speed-)** than [`torchio`](https://github.com/fepegar/torchio) by
 
 - **only** using **PyTorch** → full GPU(+autograd) support 🔥
 - being tiny: **~200 lines of code** → no room for bugs 🐛
@@ -7,10 +7,10 @@
 while offering **~20 different augmentations** (incl. MRI-specific operations) 🩻
 
 👶 Normal users should use `mriaug` via [`niftiai`](https://github.com/codingfisch/niftiai), a deep learning framework for 3D images, since it
-- provides the function `aug_transforms3d`: A convenient way to compile all `mriaug`mentations!
+- provides `aug_transforms3d`: A convenient function that compiles all `mriaug`mentations!
 - simplifies all the code needed for data loading, training, visualization...check it out [here](https://github.com/codingfisch/niftiai)!
 
-👴 Experienced users that only want to use `mriaug` can read [`niftiai/augment.py`](https://github.com/codingfisch/niftiai/blob/main/niftiai/augment.py) as a cheat sheet
+👴 Experienced users can read [`niftiai/augment.py`](https://github.com/codingfisch/niftiai/blob/main/niftiai/augment.py) as a `mriaug` cheat sheet
 
 ## Usage 💡
 Let's create a 3D image tensor (with additional batch and channel dimension) and apply `flip3d`
@@ -24,7 +24,34 @@ x_flipped = flip3d(x)
 print(x[..., 0, 0])  # tensor([[[0.0000, 0.2540, 0.5079, 0.7619]]])
 print(x_flipped[..., 0, 0])  # tensor([[[0.7619, 0.5079, 0.2540, 0.0000]]])
 ```
-Explore the following gallery to understand the usage and effect of all ~20 augmentations!
+Explore the [gallery](https://github.com/codingfisch/mriaug?tab=readme-ov-file#gallery-) to understand the usage and effect of all ~20 augmentations!
+
+## Speed 💨
+The popular libraries `torchio` and [`MONAI`](https://github.com/Project-MONAI/MONAI) (utilizes `torchio`) use [`ITK`](https://github.com/SimpleITK/SimpleITK) and can do this
+
+*PyTorch tensor → NumPy array → NiBabel image → ITK operation (C/C++) → NumPy array → PyTorch tensor*
+
+to augment a PyTorch tensor 🤦
+
+Instead, `mriaug` directly uses PyTorch—runs C/C++ on CPU and CUDA on GPU—resulting in
+- **~50x fewer lines of code**: `torchio`: ~10,000 LOC, `mriaug`: ~200 LOC 🤓
+- **~50x speedup** on GPU 🔥 based on the below tables (run [`speed.py`](https://github.com/codingfisch/mriaug/blob/main/runall.py) to reproduce) 💨
+
+*Runtimes on AMD Ryzen 9 5950X CPU and NVIDIA GeForce RTX 3090 GPU*
+
+### Runtime in seconds
+
+| Transformation | `torchio` | `mriaug` on CPU | `mriaug` on GPU | Speedup vs. torchio |
+|----------------|-----------|-----------------|-----------------|---------------------|
+| Flip           | 0.014     | 0.011           | 0.002           | **7.5x**            |
+| Affine         | 0.296     | 0.601           | 0.011           | **27.8x**           |
+| Warp           | 0.942     | 0.825           | 0.076           | **12.3x**           |
+| Bias Field     | 3.339     | 0.196           | 0.043           | **77.4x**           |
+| Noise          | 0.115     | 0.104           | 0.001           | **219.7x**          |
+| Downsample     | 0.303     | 0.011           | 0.001           | **591.0x**          |
+| Ghosting       | 0.231     | 0.173           | 0.003           | **73.3x**           |
+| Spike          | 0.291     | 0.173           | 0.003           | **96.9x**           |
+| Motion         | 0.682     | 0.531           | 0.009           | **76.9x**           |
 
 ## Gallery 🧠
 
@@ -100,44 +127,3 @@ and **run all augmentations** (see [`runall.py`](https://github.com/codingfisch/
 
 ### [`motion3d(x, intensity=.5)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L149)
 ![](data/motion.png)
-
-## Speed
-Popular libraries like `torchio` and [`MONAI`](https://github.com/Project-MONAI/MONAI)—based on `torchio`—use [`ITK`](https://github.com/SimpleITK/SimpleITK) and can do this
-
-PyTorch tensor → NumPy array → NiBabel image → ITK operation (C/C++) → NumPy array → PyTorch tensor
-
-to augment a PyTorch tensor 🤦
-
-Instead, `mriaug` directly uses PyTorch—runs C/C++ on CPU and CUDA on GPU—to do the same augmentations, resulting in
-- ~50x fewer lines of code: `torchio`: ~10,000 LOC, `mriaug`: ~200 LOC 🤓
-- ~50x speedup on GPU 🔥 based on the below tables (run [`speed.py`](https://github.com/codingfisch/mriaug/blob/main/runall.py) to reproduce)
-
-*Runtimes on AMD Ryzen 9 5950X CPU and NVIDIA GeForce RTX 3090 GPU*
-
-### Runtime in seconds
-
-| Transformation | `torchio` | `mriaug` on CPU | `mriaug` on GPU | Speedup vs. torchio |
-|----------------|-----------|-----------------|-----------------|---------------------|
-| Flip           | 0.014     | 0.011           | 0.002           | **7.5x**            |
-| Affine         | 0.296     | 0.601           | 0.011           | **27.8x**           |
-| Warp           | 0.942     | 0.825           | 0.076           | **12.3x**           |
-| Bias Field     | 3.339     | 0.196           | 0.043           | **77.4x**           |
-| Noise          | 0.115     | 0.104           | 0.001           | **219.7x**          |
-| Downsample     | 0.303     | 0.011           | 0.001           | **591.0x**          |
-| Ghosting       | 0.231     | 0.173           | 0.003           | **73.3x**           |
-| Spike          | 0.291     | 0.173           | 0.003           | **96.9x**           |
-| Motion         | 0.682     | 0.531           | 0.009           | **76.9x**           |
-
-### Runtime in seconds with `OMP_NUM_THREADS=1`
-
-| Transformation | `torchio` | `mriaug` on CPU | `mriaug` on GPU | Speedup vs. torchio |
-|----------------|-----------|-----------------|-----------------|---------------------|
-| Flip           | 0.014     | 0.031           | 0.002           | **7.7x**            |
-| Affine         | 0.387     | 0.803           | 0.010           | **37.0x**           |
-| Warp           | 0.931     | 1.491           | 0.066           | **14.1x**           |
-| Bias Field     | 3.191     | 0.669           | 0.044           | **72.7x**           |
-| Noise          | 0.175     | 0.137           | 0.001           | **299.2x**          |
-| Downsample     | 0.289     | 0.039           | 0.000           | **615.9x**          |
-| Ghosting       | 0.790     | 0.561           | 0.003           | **252.7x**          |
-| Spike          | 0.808     | 0.559           | 0.003           | **269.5x**          |
-| Motion         | 1.638     | 1.253           | 0.009           | **183.3x**          |
