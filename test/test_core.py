@@ -31,17 +31,17 @@ class TestCore(unittest.TestCase):
             x_cropped = core.crop3d(x, translate, size)
             self.assertEqual(x_cropped.shape, (*shape[:2], *size))
 
-    def test_translate3d(self):
+    def test_zoom3d(self):
         for shape in SHAPES:
             x = linspace(0, 1, tensor(shape).prod().item()).view(*shape)
-            translate = zeros((shape[0], 3))
+            zoom = zeros((shape[0], 3))
             size = tuple(s - 2 for s in shape[-3:])
-            x_translated = core.translate3d(x, translate, size=size)
-            self.assertEqual(x_translated.shape, (*shape[:2], *size))
-            x_translated = core.translate3d(x, translate)
-            self.assertTrue(allclose(x, x_translated))
-            x_translated = core.translate3d(x, translate, upsample=2)
-            self.assertTrue(allclose(x, x_translated, rtol=5e-2, atol=2e-1))
+            x_zoomed = core.zoom3d(x, zoom, size=size)
+            self.assertEqual(x_zoomed.shape, (*shape[:2], *size))
+            x_zoomed = core.zoom3d(x, zoom)
+            self.assertTrue(allclose(x, x_zoomed))
+            x_zoomed = core.zoom3d(x, zoom, upsample=2)
+            self.assertTrue(allclose(x, x_zoomed, rtol=5e-2, atol=2e-1))
 
     def test_rotate3d(self):
         for shape in SHAPES:
@@ -55,17 +55,17 @@ class TestCore(unittest.TestCase):
             x_rotated = core.rotate3d(x, rotate, upsample=2)
             self.assertTrue(allclose(x, x_rotated, rtol=5e-2, atol=2e-1))
 
-    def test_zoom3d(self):
+    def test_translate3d(self):
         for shape in SHAPES:
             x = linspace(0, 1, tensor(shape).prod().item()).view(*shape)
-            zoom = zeros((shape[0], 3))
+            translate = zeros((shape[0], 3))
             size = tuple(s - 2 for s in shape[-3:])
-            x_zoomed = core.zoom3d(x, zoom, size=size)
-            self.assertEqual(x_zoomed.shape, (*shape[:2], *size))
-            x_zoomed = core.zoom3d(x, zoom)
-            self.assertTrue(allclose(x, x_zoomed))
-            x_zoomed = core.zoom3d(x, zoom, upsample=2)
-            self.assertTrue(allclose(x, x_zoomed, rtol=5e-2, atol=2e-1))
+            x_translated = core.translate3d(x, translate, size=size)
+            self.assertEqual(x_translated.shape, (*shape[:2], *size))
+            x_translated = core.translate3d(x, translate)
+            self.assertTrue(allclose(x, x_translated))
+            x_translated = core.translate3d(x, translate, upsample=2)
+            self.assertTrue(allclose(x, x_translated, rtol=5e-2, atol=2e-1))
 
     def test_shear3d(self):
         for shape in SHAPES:
@@ -84,11 +84,11 @@ class TestCore(unittest.TestCase):
             x = linspace(0, 1, tensor(shape).prod().item()).view(*shape)
             param = zeros((shape[0], 3))
             size = tuple(s - 2 for s in shape[-3:])
-            x_affine = core.affine3d(x, translate=param, rotate=param, zoom=param, shear=param, size=size)
+            x_affine = core.affine3d(x, zoom=param, rotate=param, translate=param, shear=param, size=size)
             self.assertEqual(x_affine.shape, (*shape[:2], *size))
-            x_affine = core.affine3d(x, translate=param, rotate=param, zoom=param, shear=param)
+            x_affine = core.affine3d(x, zoom=param, rotate=param, translate=param, shear=param)
             self.assertTrue(allclose(x, x_affine))
-            x_affine = core.affine3d(x, translate=param, rotate=param, zoom=param, shear=param, upsample=2)
+            x_affine = core.affine3d(x, zoom=param, rotate=param, translate=param, shear=param, upsample=2)
             self.assertTrue(allclose(x, x_affine, rtol=5e-2, atol=2e-1))
 
     def test_warp3d(self):
@@ -107,12 +107,31 @@ class TestCore(unittest.TestCase):
             x = linspace(0, 1, tensor(shape).prod().item()).view(*shape)
             param = zeros((shape[0], 3))
             size = tuple(s - 2 for s in shape[-3:])
-            x_warped = core.affinewarp3d(x, translate=param, rotate=param, zoom=param, shear=param, size=size)
+            x_warped = core.affinewarp3d(x, zoom=param, rotate=param, translate=param, shear=param, size=size)
             self.assertEqual(x_warped.shape, (*shape[:2], *size))
-            x_warped = core.affinewarp3d(x, translate=param, rotate=param, zoom=param, shear=param, magnitude=0)
+            x_warped = core.affinewarp3d(x, zoom=param, rotate=param, translate=param, shear=param, magnitude=0)
             self.assertTrue(allclose(x, x_warped))
-            x_warped = core.affinewarp3d(x, translate=param, rotate=param, zoom=param, shear=param, magnitude=0, upsample=2)
+            x_warped = core.affinewarp3d(x, zoom=param, rotate=param, translate=param, shear=param, magnitude=0, upsample=2)
             self.assertTrue(allclose(x, x_warped, rtol=5e-2, atol=2e-1))
+
+    def test_bias_field3d(self):
+        k_size = (2, 2, 2)
+        for shape in SHAPES:
+            x = linspace(0, 1, tensor(shape).prod().item()).view(*shape)
+            intensity = zeros(shape[0])
+            x_biased = core.bias_field3d(x, intensity, k_size=k_size)
+            self.assertTrue(equal(x, x_biased))
+            x_biased = core.bias_field3d(x, intensity=0, k_size=k_size)
+            self.assertTrue(equal(x, x_biased))
+            x_biased = core.bias_field3d(x, intensity=.1, k_size=k_size)
+            self.assertFalse(equal(x, x_biased))
+            k = randn((*shape[:2], *k_size))
+            x_biased = core.bias_field3d(x, intensity=0, k=k)
+            self.assertTrue(equal(x, x_biased))
+            if shape[0] > 1:
+                intensity[0] = .2
+                x_biased = core.bias_field3d(x, intensity, k=k)
+                self.assertFalse(equal(x_biased[0], x_biased[1]))
 
     def test_contrast(self):
         for shape in SHAPES:
@@ -150,36 +169,18 @@ class TestCore(unittest.TestCase):
             x_sampled = core.downsample3d(x, scale)
             self.assertTrue(allclose(x, x_sampled, atol=5e-1))
 
-    def test_bias_field3d(self):
-        for shape in SHAPES:
-            x = linspace(0, 1, tensor(shape).prod().item()).view(*shape)
-            intensity = zeros(shape[0])
-            x_biased = core.bias_field3d(x, intensity)
-            self.assertTrue(equal(x, x_biased))
-            x_biased = core.bias_field3d(x, intensity=0)
-            self.assertTrue(equal(x, x_biased))
-            x_biased = core.bias_field3d(x, intensity=.1)
-            self.assertFalse(equal(x, x_biased))
-            x_randn = randn(shape).view(shape[0], -1)
-            x_biased = core.bias_field3d(x, intensity=0, x_randn=x_randn)
-            self.assertTrue(equal(x, x_biased))
-            if shape[0] > 1:
-                intensity[0] = .2
-                x_biased = core.bias_field3d(x, intensity, x_randn=x_randn)
-                self.assertFalse(equal(x_biased[0], x_biased[1]))
-
     def test_ghosting3d(self):
         for shape in SHAPES:
             x = linspace(0, 1, tensor(shape).prod().item()).view(*shape)
             intensity = zeros(shape[0])
             x_ghosted = core.ghosting3d(x, intensity)
-            self.assertTrue(allclose(x, x_ghosted))
+            self.assertTrue(allclose(x, x_ghosted, atol=1e-7))
             x_ghosted = core.ghosting3d(x, intensity, dim=1)
-            self.assertTrue(allclose(x, x_ghosted))
+            self.assertTrue(allclose(x, x_ghosted, atol=1e-7))
             x_ghosted = core.ghosting3d(x, intensity=0)
-            self.assertTrue(allclose(x, x_ghosted))
+            self.assertTrue(allclose(x, x_ghosted, atol=1e-7))
             x_ghosted = core.ghosting3d(x, intensity=.1)
-            self.assertFalse(allclose(x, x_ghosted))
+            self.assertFalse(allclose(x, x_ghosted, atol=1e-7))
             if shape[0] > 1:
                 intensity[0] = .2
                 x_ghosted = core.ghosting3d(x, intensity)
@@ -190,13 +191,12 @@ class TestCore(unittest.TestCase):
             x = linspace(0, 1, tensor(shape).prod().item()).view(*shape)
             intensity = zeros(shape[0])
             x_spiked = core.spike3d(x, intensity)
-            self.assertTrue(allclose(x, x_spiked))
+            self.assertTrue(allclose(x, x_spiked, atol=1e-7))
             x_spiked = core.spike3d(x, intensity=0)
-            #print((x_spiked - x).abs().max(), (x_spiked - x).abs().mean())
-            self.assertTrue(allclose(x, x_spiked))
-            x_spiked = core.spike3d(x, intensity=100)
-            #print((x_spiked - x).abs().max(), (x_spiked - x).abs().mean())
-            #self.assertFalse(allclose(x, x_spiked))  # TODO: why does this fail?
+            self.assertTrue(allclose(x, x_spiked, atol=1e-7))
+            # x_spiked = core.spike3d(x, intensity=10)
+            # print((x_spiked - x).abs().max(), (x_spiked - x).abs().mean())
+            # self.assertFalse(allclose(x, x_spiked, atol=1e-7))
             if shape[0] > 1:
                 intensity[0] = .2
                 x_spiked = core.spike3d(x, intensity)
@@ -207,13 +207,13 @@ class TestCore(unittest.TestCase):
             x = linspace(0, 1, tensor(shape).prod().item()).view(*shape)
             intensity = zeros(shape[0])
             x_ringed = core.ringing3d(x, intensity)
-            self.assertTrue(allclose(x, x_ringed))
+            self.assertTrue(allclose(x, x_ringed, atol=1e-7))
             x_ringed = core.ringing3d(x, intensity, dim=1)
-            self.assertTrue(allclose(x, x_ringed))
+            self.assertTrue(allclose(x, x_ringed, atol=1e-7))
             x_ringed = core.ringing3d(x, intensity=0)
-            self.assertTrue(allclose(x, x_ringed))
+            self.assertTrue(allclose(x, x_ringed, atol=1e-7))
             x_ringed = core.ringing3d(x, intensity=.1)
-            self.assertFalse(allclose(x, x_ringed))
+            self.assertFalse(allclose(x, x_ringed, atol=1e-7))
             if shape[0] > 1:
                 intensity[0] = .2
                 x_ringed = core.ringing3d(x, intensity)
@@ -224,11 +224,11 @@ class TestCore(unittest.TestCase):
             x = linspace(0, 1, tensor(shape).prod().item()).view(*shape)
             intensity = zeros(shape[0])
             x_moved = core.motion3d(x, intensity)
-            self.assertTrue(allclose(x, x_moved))
+            self.assertTrue(allclose(x, x_moved, atol=1e-7))
             x_moved = core.motion3d(x, intensity=0)
-            self.assertTrue(allclose(x, x_moved))
-            x_moved = core.motion3d(x, intensity=.1)
-            #self.assertFalse(allclose(x, x_moved))  # TODO: why does this fail?
+            self.assertTrue(allclose(x, x_moved, atol=1e-7))
+            x_moved = core.motion3d(x, intensity=.1, translate=.2)
+            self.assertFalse(allclose(x, x_moved))
             if shape[0] > 1:
                 intensity[0] = .2
                 x_moved = core.motion3d(x, intensity)

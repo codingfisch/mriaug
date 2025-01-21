@@ -95,10 +95,10 @@ and **run all augmentations** (see [`runall.py`](https://github.com/codingfisch/
 ### [`affine3d(x, zoom, rotate, translate, shear)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L51)
 ![](data/affine.png)
 
-### [`warp3d(x, magnitude=1.)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L58)
+### [`warp3d(x, magnitude=.1)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L58)
 ![](data/warp.png)
 
-### [`affinewarp3d(x, zoom, rotate, translate, shear, magnitude=1.)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L67)
+### [`affinewarp3d(x, zoom, rotate, translate, shear, magnitude=.1)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L67)
 ![](data/affinewarp.png)
 
 ### [`bias_field3d(x, intensity=2.)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L79)

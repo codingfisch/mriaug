@@ -55,7 +55,7 @@ def affine3d(x: Tensor, zoom: Tensor = None, rotate: Tensor = None, translate: T
     return apply_affine(x, affine, size, mode, upsample, pad_mode, align_corners)
 
 
-def warp3d(x: Tensor, magnitude: (int, float, Tensor) = 1, k_size: tuple = (2, 2, 2), k: Tensor = None,
+def warp3d(x: Tensor, magnitude: (int, float, Tensor) = .1, k_size: tuple = (2, 2, 2), k: Tensor = None,
            size: tuple = None, mode: str = 'bilinear', upsample: (int, float) = 1., pad_mode: str = 'zeros') -> Tensor:
     size = x.shape[-3:] if size is None else size
     assert len(size) == 3, 'Size must have 3(=spatial) dimensions'
@@ -65,7 +65,7 @@ def warp3d(x: Tensor, magnitude: (int, float, Tensor) = 1, k_size: tuple = (2, 2
 
 
 def affinewarp3d(x: Tensor, zoom: Tensor = None, rotate: Tensor = None, translate: Tensor = None, shear: Tensor = None,
-                 magnitude: (int, float, Tensor) = 1, k_size: tuple = (2, 2, 2), k: Tensor = None, size: tuple = None,
+                 magnitude: (int, float, Tensor) = .1, k_size: tuple = (2, 2, 2), k: Tensor = None, size: tuple = None,
                  mode: str = 'bilinear', upsample: (int, float) = 1., pad_mode: str = 'zeros') -> Tensor:
     size = x.shape[-3:] if size is None else size
     grid_size = [int(upsample * s) for s in size] if upsample > 1 and mode != 'nearest' else size
@@ -114,22 +114,22 @@ def ghosting3d(x: Tensor, intensity: (int, float, Tensor) = .2, num_ghosts: int 
 
 
 def spike3d(x: Tensor, intensity: (int, float, Tensor) = .2, frequencies: Tensor = None) -> Tensor:
-    frequencies = rand((len(x), 3)) if frequencies is None else frequencies
+    frequencies = .1 * rand((len(x), 3)) + .1 if frequencies is None else frequencies
     assert len(x) == len(frequencies), 'Batch size(=.shape[0]) of "x" and "freqs" must be equal'
     gain = ones_like(x)
-    freqs = (frequencies.cpu() * tensor(x.shape[-3:]) / 10 + 10).int().clip(max=tensor(x.shape[-3:]) - 1)  # .../ 10 + 10 -> freqs are in a sane range
+    freqs = (frequencies.cpu() * tensor(x.shape[-3:])).int()
     for i, f in enumerate(freqs):
-        gain[i, ..., f[0], f[1], f[2]] *= (intensity[i] if isinstance(intensity, Tensor) else intensity) * f.min() * 100  # min(freq) * 100 for a sane magnitude
+        gain[i, ..., f[0], f[1], f[2]] = 1 + (intensity[i] if isinstance(intensity, Tensor) else intensity) * f.min() * 100
     return modify_k_space(x, gain)
 
 
-def ringing3d(x: Tensor, intensity: (int, float, Tensor) = .5, frequency: float = .7, band: float = .05, dim: int = 0) -> Tensor:
+def ringing3d(x: Tensor, intensity: (int, float, Tensor) = .5, frequency: float = .7, dim: int = 0) -> Tensor:
     assert dim in [0, 1, 2], 'dim must be 0 (sagittal), 1 (coronal) or 2 (axial)'
     freq = (get_identity_grid(size=(1, *x.shape[-3:]), device=x.device)[0] + 1) / 2
     freq = sum([freq[..., i] ** 2 for i in range(2) if i != dim]).sqrt()
     gain = ones_like(x)
-    lowpass = (frequency + band / 2) > freq
-    highpass = (frequency - band / 2) < freq
+    lowpass = (frequency * 1.05) > freq
+    highpass = (frequency * .95) < freq
     gain[..., lowpass & highpass] = 1 - 10 * to_ndim(intensity, x.ndim - 2)
     return modify_k_space(x, gain)
 

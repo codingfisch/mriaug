@@ -81,12 +81,12 @@ def sample(x: Tensor, grid: Tensor, size: tuple = None, mode: str = 'bilinear',
         return grid_sample(x, grid, **kwargs)
 
 
-def get_warp_grid(magnitude: (float, Tensor) = 1., k_size: tuple = (2, 2, 2), k: Tensor = None,
+def get_warp_grid(magnitude: (float, Tensor) = .1, k_size: tuple = (2, 2, 2), k: Tensor = None,
                   size: tuple = None, device=None) -> Tensor:
     grid = get_identity_grid(size, device)
-    k = randn((*size[:2], *k_size), device=device) if k is None else k
+    k = randn((size[0], 3, *k_size), device=device) if k is None else k
     disp = fft.irfftn(to_ndim(magnitude, k.ndim) * k, s=k_size)
-    return grid + resize(disp, out_shape=size, **RESIZE_KWARGS).permute(0, 2, 3, 4, 1)
+    return grid + resize(disp, out_shape=(size[0], 3, *size[-3:]), **RESIZE_KWARGS).permute(0, 2, 3, 4, 1)
 
 
 def get_identity_grid(size: tuple, device=None) -> Tensor:
