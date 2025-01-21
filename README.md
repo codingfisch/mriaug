@@ -10,7 +10,7 @@ while offering **~20 different augmentations** (incl. MRI-specific operations) �
 - provides `aug_transforms3d`: A convenient function that compiles all `mriaug`mentations!
 - simplifies all the code needed for data loading, training, visualization...check it out [here](https://github.com/codingfisch/niftiai)!
 
-👴 Experienced users can read [`niftiai/augment.py`](https://github.com/codingfisch/niftiai/blob/main/niftiai/augment.py) as a `mriaug` cheat sheet
+👴 Experienced users can build their own framework upon `mriaug` (use [`niftiai/augment.py`](https://github.com/codingfisch/niftiai/blob/main/niftiai/augment.py) as a cheat sheet)
 
 ## Usage 💡
 Let's create a 3D image tensor (with additional batch and channel dimension) and apply `flip3d`
@@ -27,7 +27,7 @@ print(x_flipped[..., 0, 0])  # tensor([[[0.7619, 0.5079, 0.2540, 0.0000]]])
 Explore the [gallery](https://github.com/codingfisch/mriaug?tab=readme-ov-file#gallery-) to understand the usage and effect of all ~20 augmentations!
 
 ## Speed 💨
-The popular libraries `torchio` and [`MONAI`](https://github.com/Project-MONAI/MONAI) (utilizes `torchio`) use [`ITK`](https://github.com/SimpleITK/SimpleITK) and can do this
+The popular libraries `torchio` and [`MONAI`](https://github.com/Project-MONAI/MONAI) (utilizes `torchio`) use [`ITK`](https://github.com/SimpleITK/SimpleITK) resulting in these operations
 
 *PyTorch tensor → NumPy array → NiBabel image → ITK operation (C/C++) → NumPy array → PyTorch tensor*
 
