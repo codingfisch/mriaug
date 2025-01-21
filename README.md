@@ -10,7 +10,7 @@ while offering **~20 different augmentations** (incl. MRI-specific operations) �
 - provides `aug_transforms3d`: A convenient function that compiles all `mriaug`mentations!
 - simplifies all the code needed for data loading, training, visualization...check it out [here](https://github.com/codingfisch/niftiai)!
 
-👴 Experienced users can read [`niftiai/augment.py`](https://github.com/codingfisch/niftiai/blob/main/niftiai/augment.py) as a `mriaug` cheat sheet
+👴 Experienced users can use `mriaug` to build their own framework (read [`niftiai/augment.py`](https://github.com/codingfisch/niftiai/blob/main/niftiai/augment.py) as a cheat sheet)
 
 ## Usage 💡
 Let's create a 3D image tensor (with additional batch and channel dimension) and apply `flip3d`
