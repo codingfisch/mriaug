@@ -35,7 +35,7 @@ to augment a PyTorch tensor 🤦
 
 Instead, `mriaug` directly uses PyTorch—runs C/C++ on CPU and CUDA on GPU—resulting in
 - **~50x fewer lines of code**: `torchio`: ~10,000 LOC, `mriaug`: ~200 LOC 🤓
-- **~50x speedup** on GPU 🔥 based on the below tables (run [`speed.py`](https://github.com/codingfisch/mriaug/blob/main/runall.py) to reproduce) 💨
+- **~50x speedup** on GPU 🔥 based on the table below (run [`speed.py`](https://github.com/codingfisch/mriaug/blob/main/runall.py) to reproduce) 💨
 
 *Runtimes on AMD Ryzen 9 5950X CPU and NVIDIA GeForce RTX 3090 GPU*
 
