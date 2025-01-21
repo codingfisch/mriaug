@@ -134,7 +134,7 @@ def ringing3d(x: Tensor, intensity: (int, float, Tensor) = .5, frequency: float 
     return modify_k_space(x, gain)
 
 
-def motion3d(x: Tensor, intensity: (int, float, Tensor) = .4, translate: (float, Tensor) = .01) -> Tensor:
+def motion3d(x: Tensor, intensity: (int, float, Tensor) = .4, translate: (float, Tensor) = .02) -> Tensor:
     if not isinstance(translate, Tensor):
         translate = translate * ones((len(x), 3), dtype=x.dtype, device=x.device)
     offset = to_ndim(intensity, x.ndim) * fft.fftn(translate3d(x, translate=translate, mode='nearest'), s=x.shape[-3:])
