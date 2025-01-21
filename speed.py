@@ -27,7 +27,7 @@ mriaug_run_args = {op: '' for op in OPS}
 mriaug_setups['affine'] = f'zoom, rotate, translate = torch.tensor([{zoom}]), torch.tensor([{rotate}]), torch.tensor([{translate}])'
 mriaug_run_args['affine'] = ', zoom=zoom, rotate=rotate, translate=translate'
 mriaug_run_args['warp'] = ', magnitude=1.'
-mriaug_run_args['bias_field'] = ', intensity=1.'
+mriaug_run_args['bias_field'] = ', intensity=2.'
 mriaug_run_args['noise'] = ', intensity=.05'
 mriaug_run_args['downsample'] = ', scale=.25, dim=2'
 mriaug_run_args['ghosting'] = ', intensity=.5'

@@ -74,7 +74,7 @@ and **run all augmentations** (see [`runall.py`](https://github.com/codingfisch/
 ### [`affinewarp3d(x, translate, rotate, zoom, shear, magnitude=1.)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L73)
 ![](data/affinewarp.png)
 
-### [`bias_field3d(x, intensity=1.)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L111)
+### [`bias_field3d(x, intensity=2.)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L111)
 ![](data/bias_field.png)
 
 ### [`contrast(x, lighting=.5)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L88)

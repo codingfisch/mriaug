@@ -34,7 +34,7 @@ if __name__ == '__main__':
     save_image(mriaug.affine3d(x, translate, rotate, zoom, shear), 'data/affine.png')
     save_image(mriaug.warp3d(x, magnitude=1.), 'data/warp.png')
     save_image(mriaug.affinewarp3d(x, zoom, rotate, translate, shear, magnitude=1.), 'data/affinewarp.png')
-    save_image(mriaug.bias_field3d(x, intensity=1.), 'data/bias_field.png')
+    save_image(mriaug.bias_field3d(x, intensity=2.), 'data/bias_field.png')
     save_image(mriaug.contrast(x, lighting=.5), 'data/contrast.png')
     save_image(mriaug.noise3d(x, intensity=.05), 'data/noise.png')
     save_image(mriaug.chi_noise3d(x, intensity=.05, dof=3), 'data/chi_noise.png')
