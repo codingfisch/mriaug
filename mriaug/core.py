@@ -9,12 +9,12 @@ def flip3d(x: Tensor, dim: int = 0) -> Tensor:
 
 
 def dihedral3d(x, k):
-    if k < 8:
-        return rot90(x if k < 4 else rot90(x, 2, (-3, -1)), k % 4, (-2, -1))
-    elif k < 16:
-        return rot90(rot90(x, 1 if k < 12 else -1, (-3, -1)), k % 4, (-3, -2))
+    if (k % 24) < 8:
+        return rot90(x if (k % 24) < 4 else rot90(x, 2, (-3, -1)), k % 4, (-2, -1))
+    elif (k % 24) < 16:
+        return rot90(rot90(x, 1 if (k % 24) < 12 else -1, (-3, -1)), k % 4, (-3, -2))
     else:
-        return rot90(rot90(x, 1 if k < 20 else -1, (-3, -2)), k % 4, (-3, -1))
+        return rot90(rot90(x, 1 if (k % 24) < 20 else -1, (-3, -2)), k % 4, (-3, -1))
 
 
 def crop3d(x: Tensor, translate: Tensor, size: tuple) -> Tensor:
@@ -70,7 +70,7 @@ def affinewarp3d(x: Tensor, zoom: Tensor = None, rotate: Tensor = None, translat
     size = x.shape[-3:] if size is None else size
     grid_size = [int(upsample * s) for s in size] if upsample > 1 and mode != 'nearest' else size
     grid = get_warp_grid(magnitude, k_size=k_size, k=k, size=(len(x), *grid_size), device=x.device).to(x.dtype)
-    affine = get_affine(translate, rotate, zoom, shear)
+    affine = get_affine(zoom=zoom, rotate=rotate, translate=translate, shear=shear)
     grid = cat([grid, ones_like(grid[..., :1])], dim=-1)
     grid = einsum('bij,bxyzj->bxyzi', affine, grid)
     return sample(x, grid, size, mode, pad_mode, align_corners=True)

@@ -25,13 +25,13 @@ def get_crop_slices(crop, size, shape):
     return [slice(max(0, c), min(c + s, os)) for c, s, os in zip(crop, size, shape)]
 
 
-def get_affine(translate: Tensor = None, rotate: Tensor = None, zoom: Tensor = None, shear: Tensor = None) -> Tensor:
-    not_none_arg = [arg for arg in [translate, rotate, zoom, shear] if arg is not None][0]
-    translate = zeros_like(not_none_arg) if translate is None else translate
-    rotate = zeros_like(not_none_arg) if rotate is None else rotate
+def get_affine(zoom: Tensor = None, rotate: Tensor = None, translate: Tensor = None, shear: Tensor = None) -> Tensor:
+    not_none_arg = [arg for arg in [zoom, rotate, translate, shear] if arg is not None][0]
     zoom = zeros_like(not_none_arg) if zoom is None else zoom
+    rotate = zeros_like(not_none_arg) if rotate is None else rotate
+    translate = zeros_like(not_none_arg) if translate is None else translate
     shear = zeros_like(not_none_arg) if shear is None else shear
-    for v in [translate, rotate, zoom, shear]:
+    for v in [zoom, rotate, translate, shear]:
         check_vector_shape(v)
     mat3x3 = (rotation_matrix(rotate) * (1 + zoom[:, None])) @ shear_matrix(shear)
     return cat([mat3x3, translate[..., None]], dim=-1)
@@ -85,8 +85,8 @@ def get_warp_grid(magnitude: (float, Tensor) = .1, k_size: tuple = (2, 2, 2), k:
                   size: tuple = None, device=None) -> Tensor:
     grid = get_identity_grid(size, device)
     k = randn((size[0], 3, *k_size), device=device) if k is None else k
-    disp = fft.irfftn(to_ndim(magnitude, k.ndim) * k, s=k_size)
-    return grid + resize(disp, out_shape=(size[0], 3, *size[-3:]), **RESIZE_KWARGS).permute(0, 2, 3, 4, 1)
+    disp = fft.rfftn(to_ndim(magnitude, k.ndim) * k, s=size[-3:])
+    return grid + disp.permute(0, 2, 3, 4, 1)
 
 
 def get_identity_grid(size: tuple, device=None) -> Tensor:
@@ -97,8 +97,8 @@ def get_identity_grid(size: tuple, device=None) -> Tensor:
 def get_bias_field(intensity: (float, Tensor) = 1., k_size: tuple = (2, 2, 2),
                    k: Tensor = None, size: tuple = None, device=None) -> Tensor:
     k = randn((*size[:2], *k_size), device=device) if k is None else k
-    bias = fft.irfftn(to_ndim(intensity, k.ndim) * k, s=k_size)
-    return 1 + resize(bias, out_shape=size, **RESIZE_KWARGS)
+    bias = fft.rfftn(to_ndim(intensity, k.ndim) * k, s=size[-3:])
+    return 1 + bias
 
 
 def downsample(x: Tensor, scale: (int, float, list, tuple) = .5, dim: int = None, mode: str = 'nearest') -> Tensor:
