@@ -38,7 +38,7 @@ Instead, `mriaug` directly uses PyTorch—runs C/C++ on CPU and CUDA on GPU—re
 - **~50x speedup** on GPU 🔥 based on the table below (run [`speed.py`](https://github.com/codingfisch/mriaug/blob/main/runall.py) to reproduce) 💨
 
 <details>
-  <summary><b>Click here</b>, to see <b>runtimes</b> in seconds (on AMD 5950X CPU and NVIDIA RTX 3090 GPU)</summary>
+  <summary><b>Click here</b>, to see <b>runtimes</b> on a 256³ image in seconds (on AMD 5950X CPU and NVIDIA RTX 3090 GPU)</summary>
 
 | Transformation | `torchio` | `mriaug` on CPU | `mriaug` on GPU | Speedup vs. torchio |
 |----------------|-----------|-----------------|-----------------|---------------------|
