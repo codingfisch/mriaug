@@ -86,7 +86,7 @@ def get_warp_grid(magnitude: (float, Tensor) = .02, k_size: tuple = (2, 2, 2),
     grid = get_identity_grid(size, device)
     if k is None:
         k = randn((size[0], 3, *k_size), device=device)
-        k[:, :, 0, 0, 0] = 0
+        k[..., 0, 0, 0] = 0
     disp = fft.fftn(to_ndim(magnitude, k.ndim) * k, s=size[-3:]).real
     return grid + disp.permute(0, 2, 3, 4, 1)
 
@@ -99,8 +99,8 @@ def get_identity_grid(size: tuple, device=None) -> Tensor:
 def get_bias_field(intensity: (float, Tensor) = .2, k_size: tuple = (2, 2, 2),
                    k: Tensor = None, size: tuple = None, device=None) -> Tensor:
     if k is None:
-        k = randn((*size[:2], *k_size), device=device)
-        k[:, :, 0, 0, 0] = 0
+        k = randn((*size[:-3], *k_size), device=device)
+        k[..., 0, 0, 0] = 0
     bias = fft.fftn(to_ndim(intensity, k.ndim) * k, s=size[-3:]).real
     return 1 + bias
 
