@@ -66,7 +66,7 @@ def apply_affine(x: Tensor, affine: Tensor, size: tuple = None, mode: str = 'bil
     size = x.shape[-3:] if size is None else size
     grid_size = [int(upsample * s) for s in size] if upsample > 1 and mode != 'nearest' else size
     grid = affine_grid(affine, [len(x), 3, *grid_size], align_corners=align_corners)
-    return sample(x, grid, size, mode, pad_mode, align_corners)
+    return sample(x, grid=grid, size=size, mode=mode, pad_mode=pad_mode, align_corners=align_corners)
 
 
 def sample(x: Tensor, grid: Tensor, size: tuple = None, mode: str = 'bilinear',
@@ -109,7 +109,7 @@ def downsample(x: Tensor, scale: (int, float, list, tuple) = .5, dim: int = None
     if dim is not None and isinstance(scale, (int, float)):
         assert 0 <= dim < 3, f'Dimension must be 0, 1 or 2, but got: {dim}'
         scale = [(scale if isinstance(scale, (int, float)) else scale[0]) if i == dim else 1 for i in range(3)]
-    return interpolate(interpolate(x, scale_factor=scale, mode='nearest'), x.shape[-3:], mode=mode)
+    return interpolate(interpolate(x, scale_factor=scale, mode='nearest'), size=x.shape[-3:], mode=mode)
 
 
 def modify_k_space(x: Tensor, gain: (float, Tensor) = 1., offset: (float, Tensor) = 0.) -> Tensor:
