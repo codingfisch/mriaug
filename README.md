@@ -27,7 +27,7 @@ print(x_flipped[..., 0, 0])  # tensor([[[0.7619, 0.5079, 0.2540, 0.0000]]])
 Explore the [gallery](https://github.com/codingfisch/mriaug?tab=readme-ov-file#gallery-) to understand the usage and effect of all ~20 augmentations!
 
 ## Speed 💨
-The popular libraries `torchio` and [`MONAI`](https://github.com/Project-MONAI/MONAI) (utilizes `torchio`) use [`ITK`](https://github.com/SimpleITK/SimpleITK) resulting in these operations
+The popular libraries `torchio` and [`MONAI`](https://github.com/Project-MONAI/MONAI) (utilizes `torchio`) often use [`ITK`](https://github.com/SimpleITK/SimpleITK) like this
 
 *PyTorch tensor → NumPy array → NiBabel image → ITK operation (C/C++) → NumPy array → PyTorch tensor*
 
@@ -37,21 +37,21 @@ Instead, `mriaug` directly uses PyTorch—runs C/C++ on CPU and CUDA on GPU—re
 - **~50x fewer lines of code**: `torchio`: ~10,000 LOC, `mriaug`: ~200 LOC 🤓
 - **~50x speedup** on GPU 🔥 based on the table below (run [`speed.py`](https://github.com/codingfisch/mriaug/blob/main/runall.py) to reproduce) 💨
 
-*Runtimes on AMD Ryzen 9 5950X CPU and NVIDIA GeForce RTX 3090 GPU*
+<details>
+  <summary><b>Click here</b>, to see <b>runtimes</b> in seconds (on AMD 5950X CPU and NVIDIA RTX 3090 GPU)</summary>
 
-### Runtime in seconds
-
-| Transformation | `torchio` | `mriaug` on CPU | `mriaug` on GPU | Speedup vs. `torchio` |
-|----------------|-----------|-----------------|-----------------|-----------------------|
-| Flip           | 0.014     | 0.011           | 0.002           | **7.5x**              |
-| Affine         | 0.296     | 0.601           | 0.011           | **27.8x**             |
-| Warp           | 0.942     | 0.825           | 0.076           | **12.3x**             |
-| Bias Field     | 3.339     | 0.196           | 0.043           | **77.4x**             |
-| Noise          | 0.115     | 0.104           | 0.001           | **219.7x**            |
-| Downsample     | 0.303     | 0.011           | 0.001           | **591.0x**            |
-| Ghosting       | 0.231     | 0.173           | 0.003           | **73.3x**             |
-| Spike          | 0.291     | 0.173           | 0.003           | **96.9x**             |
-| Motion         | 0.682     | 0.531           | 0.009           | **76.9x**             |
+| Transformation | `torchio` | `mriaug` on CPU | `mriaug` on GPU | Speedup vs. torchio |
+|----------------|-----------|-----------------|-----------------|---------------------|
+| Flip           | 0.014     | 0.012           | 0.002           | **7.5x**            |
+| Affine         | 0.297     | 0.608           | 0.011           | **27.9x**           |
+| Warp           | 0.951     | 0.850           | 0.009           | **103.3x**          |
+| Bias Field     | 3.258     | 0.081           | 0.002           | **1813.0x**         |
+| Noise          | 0.117     | 0.105           | 0.001           | **230.4x**          |
+| Downsample     | 0.282     | 0.013           | 0.000           | **592.3x**          |
+| Ghosting       | 0.241     | 0.170           | 0.003           | **78.3x**           |
+| Spike          | 0.265     | 0.172           | 0.003           | **88.8x**           |
+| Motion         | 0.696     | 0.540           | 0.009           | **78.6x**           |
+</details>
 
 ## Gallery 🧠
 
@@ -95,13 +95,13 @@ and **run all augmentations** (see [`runall.py`](https://github.com/codingfisch/
 ### [`affine3d(x, zoom, rotate, translate, shear)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L51)
 ![](data/affine.png)
 
-### [`warp3d(x, magnitude=.1)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L58)
+### [`warp3d(x, magnitude=.01)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L58)
 ![](data/warp.png)
 
-### [`affinewarp3d(x, zoom, rotate, translate, shear, magnitude=.1)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L67)
+### [`affinewarp3d(x, zoom, rotate, translate, shear, magnitude=.01)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L67)
 ![](data/affinewarp.png)
 
-### [`bias_field3d(x, intensity=2.)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L79)
+### [`bias_field3d(x, intensity=.2)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L79)
 ![](data/bias_field.png)
 
 ### [`contrast(x, lighting=.5)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L84)

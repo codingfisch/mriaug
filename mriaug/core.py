@@ -8,7 +8,7 @@ def flip3d(x: Tensor, dim: int = 0) -> Tensor:
     return x.flip(-3 + dim)
 
 
-def dihedral3d(x, k):
+def dihedral3d(x: Tensor, k: int) -> Tensor:
     if (k % 24) < 8:
         return rot90(x if (k % 24) < 4 else rot90(x, 2, (-3, -1)), k % 4, (-2, -1))
     elif (k % 24) < 16:
@@ -55,7 +55,7 @@ def affine3d(x: Tensor, zoom: Tensor = None, rotate: Tensor = None, translate: T
     return apply_affine(x, affine, size, mode, upsample, pad_mode, align_corners)
 
 
-def warp3d(x: Tensor, magnitude: (int, float, Tensor) = .1, k_size: tuple = (2, 2, 2), k: Tensor = None,
+def warp3d(x: Tensor, magnitude: (int, float, Tensor) = .02, k_size: tuple = (2, 2, 2), k: Tensor = None,
            size: tuple = None, mode: str = 'bilinear', upsample: (int, float) = 1., pad_mode: str = 'zeros') -> Tensor:
     size = x.shape[-3:] if size is None else size
     assert len(size) == 3, 'Size must have 3(=spatial) dimensions'
@@ -65,7 +65,7 @@ def warp3d(x: Tensor, magnitude: (int, float, Tensor) = .1, k_size: tuple = (2, 
 
 
 def affinewarp3d(x: Tensor, zoom: Tensor = None, rotate: Tensor = None, translate: Tensor = None, shear: Tensor = None,
-                 magnitude: (int, float, Tensor) = .1, k_size: tuple = (2, 2, 2), k: Tensor = None, size: tuple = None,
+                 magnitude: (int, float, Tensor) = .02, k_size: tuple = (2, 2, 2), k: Tensor = None, size: tuple = None,
                  mode: str = 'bilinear', upsample: (int, float) = 1., pad_mode: str = 'zeros') -> Tensor:
     size = x.shape[-3:] if size is None else size
     grid_size = [int(upsample * s) for s in size] if upsample > 1 and mode != 'nearest' else size
@@ -76,7 +76,7 @@ def affinewarp3d(x: Tensor, zoom: Tensor = None, rotate: Tensor = None, translat
     return sample(x, grid, size, mode, pad_mode, align_corners=True)
 
 
-def bias_field3d(x: Tensor, intensity: (int, float, Tensor) = 1, k_size: tuple = (2, 2, 2), k: Tensor = None) -> Tensor:
+def bias_field3d(x: Tensor, intensity: (int, float, Tensor) = .2, k_size: tuple = (2, 2, 2), k: Tensor = None) -> Tensor:
     bias = get_bias_field(intensity, k_size=k_size, k=k, size=x.shape, device=x.device).to(x.dtype)
     return x * bias
 
