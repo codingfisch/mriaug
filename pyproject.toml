@@ -15,6 +15,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = '^3.9'
 torch = '*'
+resize-right = '*'
 
 [build-system]
 requires = ['poetry-core']
