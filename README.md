@@ -31,7 +31,7 @@ The popular libraries `torchio` and [`MONAI`](https://github.com/Project-MONAI/M
 
 *PyTorch tensor → NumPy array → NiBabel image → ITK operation (C/C++) → NumPy array → PyTorch tensor*
 
-to augment a PyTorch tensor 😬 That's too complicated and does not utilize the GPU (needed anyway to train neural nets) 🐌
+to augment a PyTorch tensor 😬 That's complicated and does not utilize the GPU (needed anyway to train NNs) 🐌
 
 Instead, `mriaug` directly uses PyTorch (CPU & GPU support) resulting in
 - **~50x fewer lines of code**: `torchio`: ~10,000 LOC, `mriaug`: ~200 LOC 🤓
