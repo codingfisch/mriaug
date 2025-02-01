@@ -27,13 +27,13 @@ print(x_flipped[..., 0, 0])  # tensor([[[0.7619, 0.5079, 0.2540, 0.0000]]])
 Explore the [gallery](https://github.com/codingfisch/mriaug?tab=readme-ov-file#gallery-) to understand the usage and effect of all ~20 augmentations!
 
 ## Speed 💨
-The popular libraries `torchio` and [`MONAI`](https://github.com/Project-MONAI/MONAI) (utilizes `torchio`) often use [`ITK`](https://github.com/SimpleITK/SimpleITK) like this
+The popular libraries `torchio` and [`MONAI`](https://github.com/Project-MONAI/MONAI) (utilizes `torchio`) often use [`ITK`](https://github.com/SimpleITK/SimpleITK) (CPU only) like this
 
 *PyTorch tensor → NumPy array → NiBabel image → ITK operation (C/C++) → NumPy array → PyTorch tensor*
 
-to augment a PyTorch tensor 🤦
+to augment a PyTorch tensor 😬 That's too complicated and does not utilize the GPU (needed anyway to train neural nets) 🐌
 
-Instead, `mriaug` directly uses PyTorch—runs C/C++ on CPU and CUDA on GPU—resulting in
+Instead, `mriaug` directly uses PyTorch (CPU & GPU support) resulting in
 - **~50x fewer lines of code**: `torchio`: ~10,000 LOC, `mriaug`: ~200 LOC 🤓
 - **~50x speedup** on GPU 🔥 based on the table below (run [`speed.py`](https://github.com/codingfisch/mriaug/blob/main/runall.py) to reproduce) 💨
 
