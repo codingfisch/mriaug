@@ -57,7 +57,7 @@ Instead, `mriaug` directly uses PyTorch (CPU & GPU support) resulting in
 
 Let's load an example 3D image `x`, show it with [`niftiview`](https://github.com/codingfisch/niftiview) (used to create all images below)
 
-![](data/original.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/original.png)
 
 define some arguments
 
@@ -72,58 +72,58 @@ shear = torch.tensor([[0, .05, 0]])
 and **run all augmentations** (see [`runall.py`](https://github.com/codingfisch/mriaug/blob/main/runall.py)):
 
 ### [`flip3d(x, dim=0)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L7)
-![](data/flip.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/flip.png)
 
 ### [`dihedral3d(x, k=2)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L11)
-![](data/dihedral.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/dihedral.png)
 
 ### [`crop3d(x, translate, size)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L20)
-![](data/crop.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/crop.png)
 
 ### [`zoom3d(x, zoom)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L27)
-![](data/zoom.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/zoom.png)
 
 ### [`rotate3d(x, rotate)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L33)
-![](data/rotate.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/rotate.png)
 
 ### [`translate3d(x, translate)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L39)
-![](data/translate.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/translate.png)
 
 ### [`shear3d(x, shear)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L45)
-![](data/shear.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/shear.png)
 
 ### [`affine3d(x, zoom, rotate, translate, shear)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L51)
-![](data/affine.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/affine.png)
 
 ### [`warp3d(x, magnitude=.01)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L58)
-![](data/warp.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/warp.png)
 
 ### [`affinewarp3d(x, zoom, rotate, translate, shear, magnitude=.01)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L67)
-![](data/affinewarp.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/affinewarp.png)
 
 ### [`bias_field3d(x, intensity=.2)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L79)
-![](data/bias_field.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/bias_field.png)
 
 ### [`contrast(x, lighting=.5)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L84)
-![](data/contrast.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/contrast.png)
 
 ### [`noise3d(x, intensity=.05)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L88)
-![](data/noise.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/noise.png)
 
 ### [`chi_noise3d(x, intensity=.05, dof=3)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L92) set dof=2 for Rician noise
-![](data/chi_noise.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/chi_noise.png)
 
 ### [`downsample3d(x, scale=.25, dim=2)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L97)
-![](data/downsample.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/downsample.png)
 
 ### [`ghosting3d(x, intensity=.5)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L107)
-![](data/ghosting.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/ghosting.png)
 
 ### [`spike3d(x, intensity=.2)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L116)
-![](data/spike.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/spike.png)
 
 ### [`ringing3d(x, intensity=.5)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L126)
-![](data/ringing.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/ringing.png)
 
 ### [`motion3d(x, intensity=.5)`](https://github.com/codingfisch/mriaug_beta/blob/main/mriaug/core.py#L137)
-![](data/motion.png)
+![](https://raw.githubusercontent.com/codingfisch/mriaug/refs/heads/main/data/motion.png)
