@@ -10,7 +10,7 @@ def save_image(t: torch.Tensor, filepath: str, fpath=None):
     nii = NiftiImage(arrays=t.cpu().numpy()[0, 0], affines=None)#img.affine)
     if fpath is not None:
         nii.nics[0].filepath = fpath
-    im = nii.get_image(height=296, vrange=(0, .9), fpath=fpath is not None)
+    im = nii.get_image(height=400, vrange=(0, .9), fpath=fpath is not None, layout='s')
     im.save(filepath)
 
 
@@ -25,9 +25,9 @@ if __name__ == '__main__':
     x = torch.from_numpy(x)[None, None].float()
 
     zoom = torch.tensor([[-.2, -.2, -.2]])
-    rotate = torch.tensor([[0, .1, 0]])
-    translate = torch.tensor([[0, 0, .2]])
-    shear = torch.tensor([[0, .05, 0]])
+    rotate = torch.tensor([[0, 0, .1]])
+    translate = torch.tensor([[.2, 0, 0]])
+    shear = torch.tensor([[.05, 0, 0]])
 
     for i in range(N+N2):
         save_image(mriaug.zoom3d(x, min(i+1, N)/N * zoom), f'data/gif/00_zoom_{i:02}.png', fpath='Zoom')  # None if i < N else 'Zoom'
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     for i in range(N+N2):
         save_image(mriaug.downsample3d(x, scale=max(.25, 1 - .75 * (i+1)/N), dim=2), f'data/gif/08_downsample_{i:02}.png', fpath='Downsample')
     for i in range(N+N2):
-        save_image(mriaug.ghosting3d(x, intensity=min(i+1, N)/N * .5), f'data/gif/09_ghosting_{i:02}.png', fpath='Ghosting')
+        save_image(mriaug.ghosting3d(x, intensity=min(i+1, N)/N * .5, dim=1), f'data/gif/09_ghosting_{i:02}.png', fpath='Ghosting')
     frequencies = .1 * torch.rand((1, 3)) + .1
     for i in range(N+N2):
         save_image(mriaug.spike3d(x, intensity=min(i+1, N)/N * 1., frequencies=frequencies), f'data/gif/10_spike_{i:02}.png', fpath='Spike')
